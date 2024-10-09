@@ -377,6 +377,7 @@ async function main() {
 
   // the client is supposed to provide the email and password in req.body
   app.post("/login", async function (req, res) {
+    console.log("A1")
     try {
       let { email, password } = req.body;
       if (!email || !password) {
@@ -389,24 +390,33 @@ async function main() {
       let user = await db.collection("users").findOne({
         email: email,
       });
+      console.log("B1")
+      console.log(user)
 
       // if the user exists
       if (user) {
+        console.log("A")
         // check the password (compare plaintext with the hashed one in the database)
         if (bcrypt.compareSync(password, user.password)) {
+          console.log("B")
           let accessToken = generateAccessToken(user._id, user.email);
+          console.log("C")
           res.json({
             accessToken: accessToken,
           });
+          return
         } else {
           res.status(401);
+          return
         }
       } else {
         res.status(401);
+        return
       }
     } catch (e) {
       console.error(e);
       res.status(500);
+      return
     }
   });
 }
